@@ -1,0 +1,74 @@
+CALCULADORA FREEZEEZYPEAK  -  Clon de la calculadora de Windows en ASM
+=======================================================================
+
+1. QUE ES
+---------
+Calculadora de escritorio para Windows escrita 100% en Ensamblador
+(FASM 32-bit, Win32 API), con aspecto y manejo como la calculadora
+de Windows en modo Estandar, mas su propio compilador.
+
+2. ARCHIVOS
+-----------
+  calculadora.asm              Codigo fuente ASM de la calculadora
+  compilar.bat                 El compilador: descarga FASM y ensambla
+  CalculadoraFreezeezyPeak.exe Binario generado (tras compilar)
+  tools\FASM\                  Ensamblador FASM (auto-descargado)
+  LEEME.txt                    Este archivo
+
+3. COMO COMPILAR (el compilador)
+--------------------------------
+  1) Doble clic en  compilar.bat
+  2) La primera vez descarga FASM 1.73.35 (~1 MB, necesita internet)
+  3) Ensambla y genera  CalculadoraFreezeezyPeak.exe  (9 KB aprox.)
+  4) Al final pulsa una tecla y la calculadora se ejecuta sola.
+
+  Compilacion manual (si ya tienes FASM):
+    set INCLUDE=tools\FASM\INCLUDE
+    tools\FASM\FASM.EXE calculadora.asm CalculadoraFreezeezyPeak.exe
+
+  Requisitos: Windows 7 o superior, 32 o 64 bits. Sin Visual Studio,
+  sin dependencias: el EXE solo usa KERNEL32/USER32/GDI32/MSVCRT
+  (todas vienen con Windows).
+
+4. FUNCIONES (igual que Windows Estandar)
+-----------------------------------------
+  MC MR M+ M- MS   Memoria (con indicador "M")
+  %                Porcentaje (igual que Windows: relativo si hay +,-)
+  CE / C / Back    Borrar entrada / todo / retroceso
+  1/x  x^2  sqrt   Reciproco, cuadrado y raiz cuadrada
+  / X - + =        Operaciones con encadenado y "=" repetible
+                   (pulsa = varias veces para repetir la operacion)
+  +/-  0  ,        Signo, cero y coma decimal espanola
+  Historial        Arriba se muestra la expresion (ej: "2 + 3 =")
+  Errores          "No se puede dividir entre cero" y "Entrada no valida"
+
+5. TECLADO
+----------
+  0-9  +  -  *  /  %  =  ,  .  Enter(=)  Backspace  Esc(C)  Supr(CE)
+  Teclado numerico completo (NUM0-NUM9, +, -, *, /, coma).
+  c = C,  e = CE.
+
+  Nota: la calculadora usa COMA decimal (estilo espanol).
+  Puedes teclear punto o coma, se muestra coma.
+
+6. DETALLES TECNICOS
+--------------------
+  - FASM 32-bit, formato PE GUI 4.0, ~1600 lineas ASM.
+  - Ventana Win32 (CreateWindowEx), 29 botones, 2 displays STATIC,
+    3 fuentes GDI, bucle de mensajes clasico.
+  - Numeros en coma flotante de 64 bits (double, FPU x87).
+  - Conversion texto<->numero con MSVCRT (atof/sprintf "%.12G").
+  - Evaluacion encadenada izquierda-derecha (modo Estandar).
+
+7. ESTRUCTURA DEL CODIGO (calculadora.asm)
+------------------------------------------
+  .text : WindowProc (WM_CREATE/COMMAND/CHAR/KEYDOWN/CLOSE/DESTROY)
+          + motor: AppendDigit/Dot/Back/Clear/Negate/Percent/
+            Recip/Square/Sqrt/Operator/Equals/Memory
+          + ayuda: StrLen/StrCopy/StrCat/ParseEntry/FormatCurVal/
+            UpdateDisplay/UpdateMemInd/ComputeStoredOpCur
+  .data : handles, buffers (entrada/expresion), doubles, textos/botones
+  .idata: KERNEL32/USER32/GDI32/MSVCRT
+
+Hecho con FASM + Win32 API. Que lo disfrutes!
+- FreezeezyPeak project dream
